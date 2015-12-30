@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">Pavilion</string>
+
+    <string name="show_apps">Show Apps</string>
+    <string name="show_all">Show All</string>
+    <string name="exit_prompt_title">Input password to exit</string>
+    <string name="incorrect_password">Incorrect password</string>
+</resources>
