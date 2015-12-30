@@ -3,6 +3,7 @@
 
     <string name="show_apps">Show Apps</string>
     <string name="show_all">Show All</string>
-    <string name="exit_prompt_title">Input password to exit</string>
+    <string name="password_prompt_title">Input password</string>
     <string name="incorrect_password">Incorrect password</string>
+    <string name="exit_hint">You can disable Pavilion in system Settings</string>
 </resources>
