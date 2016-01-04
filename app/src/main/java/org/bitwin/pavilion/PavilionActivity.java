@@ -9,11 +9,14 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.view.KeyEventCompat;
 import android.view.KeyEvent;
+import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import static android.widget.CompoundButton.OnCheckedChangeListener;
@@ -28,6 +31,7 @@ public class PavilionActivity extends Activity {
     private AlertDialog mShowAllAppsDialog;
     private EditText mShowAppAppsPassword;
     //private HomeKeyLocker mHomeKeyLocker;
+    private ScreenLocker mScreenLocker;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,6 +41,7 @@ public class PavilionActivity extends Activity {
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         //setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
         setContentView(R.layout.main);
+        ViewGroup container = (ViewGroup) findViewById(R.id.main_container);
 
         mCheckBox = (CheckBox) findViewById(R.id.show_all);
         mCheckBox.setVisibility(View.VISIBLE);
@@ -56,12 +61,21 @@ public class PavilionActivity extends Activity {
         setupExitDetector();
 
         //mHomeKeyLocker = new HomeKeyLocker();
+        mScreenLocker = ScreenLocker.getInstanve(this);
+        mScreenLocker.setTargetView(container);
     }
 
     @Override
     protected void onResume() {
         super.onResume();
         //mHomeKeyLocker.lock(this);
+        mScreenLocker.start();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        mScreenLocker.stop();
     }
 
     @Override
@@ -85,6 +99,14 @@ public class PavilionActivity extends Activity {
             return false;
         }
         return super.dispatchKeyEvent(event);
+    }
+
+    @Override
+    public boolean dispatchTouchEvent(MotionEvent event) {
+        if (mScreenLocker != null) {
+            mScreenLocker.onActivityTouchEvent(event);
+        }
+        return super.dispatchTouchEvent(event);
     }
 
     private void setupExitDetector() {
