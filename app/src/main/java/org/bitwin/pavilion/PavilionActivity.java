@@ -7,11 +7,13 @@ import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.os.PowerManager;
 import android.support.v4.view.KeyEventCompat;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.EditText;
@@ -63,6 +65,10 @@ public class PavilionActivity extends Activity {
         //mHomeKeyLocker = new HomeKeyLocker();
         mScreenLocker = ScreenLocker.getInstanve(this);
         mScreenLocker.setTargetView(container);
+
+        // Do not lock screen.
+        //getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+        setWakeLockEnabled(true);
     }
 
     @Override
@@ -82,6 +88,7 @@ public class PavilionActivity extends Activity {
     protected void onDestroy() {
         super.onDestroy();
         //mHomeKeyLocker.unlock();
+        setWakeLockEnabled(false);
     }
 
     public void showApps(View v) {
@@ -222,4 +229,22 @@ public class PavilionActivity extends Activity {
         showApps(mCheckBox);
         Toast.makeText(PavilionActivity.this, R.string.exit_hint, Toast.LENGTH_LONG).show();
     }
+
+    /**
+     * Ask for wake lock to avoid screen off.
+     */
+    private void setWakeLockEnabled(boolean enabled) {
+        if (mWakeLock != null) {
+            mWakeLock.release();
+        }
+        if (enabled) {
+            PowerManager pm = (PowerManager)getSystemService(POWER_SERVICE);
+            mWakeLock = pm.newWakeLock(PowerManager.SCREEN_BRIGHT_WAKE_LOCK, "pavilion_wl");
+            mWakeLock.acquire();
+        } else {
+            //
+        }
+    }
+    private PowerManager.WakeLock mWakeLock;
 }
+
