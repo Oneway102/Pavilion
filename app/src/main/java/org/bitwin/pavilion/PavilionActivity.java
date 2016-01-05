@@ -63,25 +63,32 @@ public class PavilionActivity extends Activity {
         setupExitDetector();
 
         //mHomeKeyLocker = new HomeKeyLocker();
-        mScreenLocker = ScreenLocker.getInstanve(this);
-        mScreenLocker.setTargetView(container);
+        //mScreenLocker = ScreenLocker.getInstanve(this);
+        //mScreenLocker.setTargetView(container);
+
+        // Start locker service.
+        startService(new Intent(this, LockerService.class));
 
         // Do not lock screen.
         //getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
-        setWakeLockEnabled(true);
+        //setWakeLockEnabled(true);
     }
 
     @Override
     protected void onResume() {
         super.onResume();
         //mHomeKeyLocker.lock(this);
-        mScreenLocker.start();
+        if (mScreenLocker != null) {
+            mScreenLocker.start();
+        }
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-        mScreenLocker.stop();
+        if (mScreenLocker != null) {
+            mScreenLocker.stop();
+        }
     }
 
     @Override
@@ -234,15 +241,19 @@ public class PavilionActivity extends Activity {
      * Ask for wake lock to avoid screen off.
      */
     private void setWakeLockEnabled(boolean enabled) {
-        if (mWakeLock != null) {
-            mWakeLock.release();
-        }
         if (enabled) {
-            PowerManager pm = (PowerManager)getSystemService(POWER_SERVICE);
-            mWakeLock = pm.newWakeLock(PowerManager.SCREEN_BRIGHT_WAKE_LOCK, "pavilion_wl");
-            mWakeLock.acquire();
+            if (mWakeLock == null) {
+                PowerManager pm = (PowerManager)getSystemService(POWER_SERVICE);
+                mWakeLock = pm.newWakeLock(PowerManager.ACQUIRE_CAUSES_WAKEUP|PowerManager.SCREEN_BRIGHT_WAKE_LOCK, "pavilion_wl");
+
+            }
+            if (!mWakeLock.isHeld()) {
+                mWakeLock.acquire();
+            }
         } else {
-            //
+            if (mWakeLock.isHeld()) {
+                mWakeLock.release();
+            }
         }
     }
     private PowerManager.WakeLock mWakeLock;
