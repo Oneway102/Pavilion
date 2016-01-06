@@ -251,7 +251,7 @@ public class PavilionActivity extends Activity {
                 mWakeLock.acquire();
             }
         } else {
-            if (mWakeLock.isHeld()) {
+            if (mWakeLock != null && mWakeLock.isHeld()) {
                 mWakeLock.release();
             }
         }
